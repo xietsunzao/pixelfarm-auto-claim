@@ -26,8 +26,8 @@ If you find this bot helpful, consider buying me a coffee:
 Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/pixelfarm-auto-claim-bot.git
-cd pixelfarm-auto-claim-bot
+git clone https://github.com/xietsunzao/pixelfarm-auto-claim.git
+cd pixelfarm-auto-claim
 ```
 
 ## Step 2: Install Dependencies
