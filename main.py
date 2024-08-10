@@ -13,14 +13,7 @@ init(autoreset=True)
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from api import get_token, fetch_user_data, claim_rewards
-from core import calculate_remaining_time, calculate_fruits_fall, display_user_info, display_tree_info, CHECK_INTERVAL
-
-def get_farming_session_duration(total_trees):
-    if total_trees > 1:
-        return timedelta(hours=12)
-    else:
-        return timedelta(hours=4)
-
+from core import calculate_remaining_time, calculate_fruits_fall, display_user_info, display_tree_info, get_farming_session_duration, CHECK_INTERVAL
 
 def main():
     try:

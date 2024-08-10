@@ -14,6 +14,14 @@ FRUIT_RATES = {
 CHECK_INTERVAL = 60  # Check every 60 seconds
 
 
+# Get the farming session duration based on the total number of trees
+def get_farming_session_duration(total_trees):
+    if total_trees > 1:
+        return timedelta(hours=12)
+    else:
+        return timedelta(hours=4)
+
+
 def should_harvest(tree):
     last_claimed = datetime.fromisoformat(tree['last_claimed_at'][:-1])
     time_diff = datetime.utcnow() - last_claimed
