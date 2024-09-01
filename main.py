@@ -72,7 +72,9 @@ def main():
                         tree_type = tree.get('tree_type', 'Unknown')
                         last_claimed_at = tree.get('last_claimed_at')
                         created_at = tree.get('created_at')
-                        fruits_fall = calculate_fruits_fall(tree_type, last_claimed_at)
+                        
+                        # Calculate the number of fallen fruits only if the tree is not expired
+                        fruits_fall = calculate_fruits_fall(tree_type, last_claimed_at, created_at)
                         
                         expired = is_tree_expired(tree_type, created_at)
                         ready_for_harvest = remaining_time == timedelta(0)

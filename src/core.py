@@ -61,14 +61,21 @@ def calculate_remaining_time(last_claimed_at, farming_session_duration):
     remaining_time = farming_session_duration - time_since_last_claim
     return remaining_time if remaining_time > timedelta(0) else timedelta(0)
 
-def calculate_fruits_fall(tree_type, last_claimed_at):
+
+def calculate_fruits_fall(tree_type, last_claimed_at, created_at):
     if tree_type not in FRUIT_RATES:
         return 0
+
+    # Check if the tree has expired
+    if is_tree_expired(tree_type, created_at):
+        return 0
+    
     last_claimed = datetime.fromisoformat(last_claimed_at[:-1])
     now = datetime.utcnow()
     time_elapsed = now - last_claimed
     fruits_fall = FRUIT_RATES[tree_type] * time_elapsed.total_seconds()
     return int(fruits_fall)
+
 
 def display_user_info(username, total_gems, total_trees, remaining_time):
     print(Fore.GREEN + "----------------------------------------")
