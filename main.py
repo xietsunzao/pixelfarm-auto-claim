@@ -3,7 +3,6 @@
 import sys
 import os
 import json
-import time
 from datetime import timedelta
 from colorama import Fore, init
 init(autoreset=True)
@@ -12,7 +11,7 @@ init(autoreset=True)
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from api import get_token, fetch_user_data, claim_rewards
-from core import calculate_remaining_time, calculate_fruits_fall, display_user_info, display_tree_info, get_farming_session_duration, CHECK_INTERVAL
+from core import calculate_remaining_time, calculate_fruits_fall, countdown_timer, display_user_info, display_tree_info, get_farming_session_duration
 
 class Session:
     def __init__(self):
@@ -88,7 +87,8 @@ def main():
                             print(Fore.RED + str(e))
                     else:
                         if remaining_time > timedelta(0):
-                            print(Fore.YELLOW + "The bot will automatically claim after the farming session expires.")
+                            total_seconds = int(remaining_time.total_seconds())
+                            countdown_timer(total_seconds)
                         else:
                             print(Fore.RED + "Farming session expired. No fruits to claim. Skipping claim.")
                 else:
@@ -96,8 +96,6 @@ def main():
             else:
                 print(Fore.RED + "Failed to retrieve token.")
             
-            # Wait for the next check
-            time.sleep(CHECK_INTERVAL)
     except KeyboardInterrupt:
         print(Fore.RED + "\nBot terminated by user. Goodbye!")
         sys.exit(0)
