@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from datetime import datetime, timedelta
 from colorama import Fore, init
+import time
 
 
 # Define the fruit fall rates (fruits per second) for each tree type
@@ -73,3 +73,12 @@ def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall):
     else:
         print(Fore.BLUE + f"Tree {tree_type.capitalize()} is not ready for harvest.")
     print(Fore.CYAN + "----------------------------------------")
+
+
+def countdown_timer(seconds):
+    while seconds > 0:
+        time_left = str(timedelta(seconds=seconds)).split(".")[0]  # Display only HH:MM:SS
+        print(Fore.YELLOW + f"\rWaiting for the next session: {time_left}", end="")
+        time.sleep(1)
+        seconds -= 1
+    print()  # Newline after the countdown ends
