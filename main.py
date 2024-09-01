@@ -11,7 +11,7 @@ init(autoreset=True)
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from api import get_token, fetch_user_data, claim_rewards
-from core import calculate_remaining_time, calculate_fruits_fall, countdown_timer, display_user_info, display_tree_info, get_farming_session_duration
+from core import calculate_remaining_time, calculate_fruits_fall, countdown_timer, display_user_info, display_tree_info, get_farming_session_duration, is_tree_expired
 
 class Session:
     def __init__(self):
@@ -71,11 +71,15 @@ def main():
                         fruit_total = tree.get('fruit_total', 0)
                         tree_type = tree.get('tree_type', 'Unknown')
                         last_claimed_at = tree.get('last_claimed_at')
+                        created_at = tree.get('created_at')
                         fruits_fall = calculate_fruits_fall(tree_type, last_claimed_at)
-                        ready_for_harvest = remaining_time == timedelta(0)
-                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall)
                         
-                        if ready_for_harvest and fruits_fall > 0:
+                        expired = is_tree_expired(tree_type, created_at)
+                        ready_for_harvest = remaining_time == timedelta(0)
+                        
+                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired)
+                        
+                        if ready_for_harvest and fruits_fall > 0 and not expired:
                             any_ready_for_harvest = True
                     
                     # Claim rewards using the token only if any tree is ready and has claimable fruits

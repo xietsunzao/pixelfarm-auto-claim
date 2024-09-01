@@ -13,6 +13,13 @@ FRUIT_RATES = {
 
 CHECK_INTERVAL = 60  # Check every 60 seconds
 
+# Define tree expiration periods (example: 30 days for non-plum trees)
+TREE_EXPIRATION_DAYS = {
+    'plum': None,  # Plum tree doesn't expire
+    'orange': 30,
+    'apple': 30,
+    'cherry': 30
+}
 
 # Get the farming session duration based on the total number of trees
 def get_farming_session_duration(total_trees):
@@ -28,9 +35,16 @@ def should_harvest(tree):
     # Assuming trees can be harvested every hour
     return time_diff >= timedelta(hours=1)
 
+def is_tree_expired(tree_type, created_at):
+    if TREE_EXPIRATION_DAYS.get(tree_type) is None:
+        return False  # Plum tree doesn't expire
+    created = datetime.fromisoformat(created_at[:-1])
+    expiration_period = timedelta(days=TREE_EXPIRATION_DAYS[tree_type])
+    return (datetime.utcnow() - created) > expiration_period
 
-def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall):
-    print(Fore.CYAN + f"Tree Type: {tree_type.capitalize()}")
+def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired=False):
+    label = Fore.RED + "(Expired)" if expired else ""
+    print(Fore.CYAN + f"Tree Type: {tree_type.capitalize()} {label}")
     print(Fore.CYAN + f"Total Fruit: {fruit_total}")
     print(Fore.CYAN + f"Fruits to Fall: {fruits_fall}")
     if ready_for_harvest:
@@ -64,8 +78,9 @@ def display_user_info(username, total_gems, total_trees, remaining_time):
     print(Fore.GREEN + f"Farming Session Remaining: {str(remaining_time).split('.')[0]}")  # Remove milliseconds
     print(Fore.GREEN + "----------------------------------------")
 
-def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall):
-    print(Fore.CYAN + f"Tree Type: {tree_type.capitalize()}")
+def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired=False):
+    label = Fore.RED + "(Expired)" if expired else ""
+    print(Fore.CYAN + f"Tree Type: {tree_type.capitalize()} {label}")
     print(Fore.CYAN + f"Total Fruit: {fruit_total}")
     print(Fore.CYAN + f"Fruits to Fall: {fruits_fall}")
     if ready_for_harvest:
