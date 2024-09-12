@@ -9,7 +9,9 @@ def get_token(init_data, verify_ssl=True):
     headers = {
         "accept": "application/json, text/plain, */*",
         "Referer": "https://pixelfarm.app/",
-        "Referrer-Policy": "strict-origin-when-cross-origin"
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        # Add a user-agent mobile android
+        "User-Agent": "Mozilla/5.0 (Linux; Android 10; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.181 Mobile Safari/537.36"
     }
     
     try:
@@ -17,6 +19,7 @@ def get_token(init_data, verify_ssl=True):
         response = requests.get(url, headers=headers, verify=verify_ssl)
 
         if response.status_code == 200:
+            # print data
             return response.json().get('data')
         else:
             print(f"Failed to fetch token. Status code: {response.status_code}")
@@ -36,7 +39,10 @@ def get_token(init_data, verify_ssl=True):
     
 def fetch_user_data(token):
     url = "https://api.pixelfarm.app/user"
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = {
+                    "Authorization": f"Bearer {token}",
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.181 Mobile Safari/537.36"
+               }
     response = requests.get(url, headers=headers)
     
     if response.status_code == 200:
@@ -48,7 +54,8 @@ def claim_rewards(token):
     url = "https://api.pixelfarm.app/user/claim"
     headers = {
         "Accept": "application/json, text/plain, */*",
-        "Authorization": f"Bearer {token}"
+        "Authorization": f"Bearer {token}",
+        "User-Agent": "Mozilla/5.0 (Linux; Android 10; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.181 Mobile Safari/537.36"
     }
 
     response = requests.post(url, headers=headers)
