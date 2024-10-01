@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from colorama import Fore, init
+from colorama import Fore, Style
 import time
 
 
@@ -35,12 +35,23 @@ def should_harvest(tree):
     # Assuming trees can be harvested every hour
     return time_diff >= timedelta(hours=1)
 
-def is_tree_expired(tree_type, created_at):
+def is_tree_expired(tree_type, created_at, boosted_at=None):
     if TREE_EXPIRATION_DAYS.get(tree_type) is None:
         return False  # Plum tree doesn't expire
+    
     created = datetime.fromisoformat(created_at[:-1])
+    
+    # If the tree has a boost, extend the expiration period
     expiration_period = timedelta(days=TREE_EXPIRATION_DAYS[tree_type])
+    
+    if boosted_at:
+        boost_start = datetime.fromisoformat(boosted_at[:-1])
+        # Extend expiration period by, for example, 10 days when boosted
+        extended_period = timedelta(days=10)  
+        expiration_period += extended_period
+    
     return (datetime.utcnow() - created) > expiration_period
+
 
 def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired=False):
     label = Fore.RED + "(Expired)" if expired else ""
@@ -61,20 +72,24 @@ def calculate_remaining_time(last_claimed_at, farming_session_duration):
     remaining_time = farming_session_duration - time_since_last_claim
     return remaining_time if remaining_time > timedelta(0) else timedelta(0)
 
-
-def calculate_fruits_fall(tree_type, last_claimed_at, created_at):
+def calculate_fruits_fall(tree_type, last_claimed_at, created_at, speed=1):
     if tree_type not in FRUIT_RATES:
         return 0
 
     # Check if the tree has expired
     if is_tree_expired(tree_type, created_at):
         return 0
-    
+
     last_claimed = datetime.fromisoformat(last_claimed_at[:-1])
     now = datetime.utcnow()
     time_elapsed = now - last_claimed
-    fruits_fall = FRUIT_RATES[tree_type] * time_elapsed.total_seconds()
+    
+    # Multiply by the boosted speed rate if applicable
+    fruits_fall = FRUIT_RATES[tree_type] * speed * time_elapsed.total_seconds()
     return int(fruits_fall)
+
+
+
 
 
 def display_user_info(username, total_gems, total_trees, remaining_time):
@@ -85,16 +100,20 @@ def display_user_info(username, total_gems, total_trees, remaining_time):
     print(Fore.GREEN + f"Farming Session Remaining: {str(remaining_time).split('.')[0]}")  # Remove milliseconds
     print(Fore.GREEN + "----------------------------------------")
 
-def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired=False):
-    label = Fore.RED + "(Expired)" if expired else ""
-    print(Fore.CYAN + f"Tree Type: {tree_type.capitalize()} {label}")
-    print(Fore.CYAN + f"Total Fruit: {fruit_total}")
-    print(Fore.CYAN + f"Fruits to Fall: {fruits_fall}")
-    if ready_for_harvest:
-        print(Fore.YELLOW + f"Tree {tree_type.capitalize()} is ready for harvest.")
-    else:
-        print(Fore.BLUE + f"Tree {tree_type.capitalize()} is not ready for harvest.")
-    print(Fore.CYAN + "----------------------------------------")
+def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted):
+    # Set color for expired and boosted statuses
+    tree_type_str = tree_type
+    if expired:
+        tree_type_str += f" {Fore.RED}(Expired){Style.RESET_ALL}"
+    if boosted:
+        tree_type_str += f" {Fore.GREEN}(Boosted){Style.RESET_ALL}"
+    
+    # Print tree details with colors
+    print(f"Tree Type: {tree_type_str}")
+    print(f"Total Fruit: {fruit_total}")
+    print(f"Fruits to Fall: {fruits_fall}")
+    print(f"Tree {tree_type} is {'ready for harvest' if ready_for_harvest else 'not ready for harvest'}.")
+    print("-" * 60)
 
 
 def countdown_timer(seconds):

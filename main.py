@@ -41,7 +41,7 @@ def main():
                     print(Fore.RED + f"Error fetching user data: {str(e)}. Retrying token...")
                     session.token = get_token(init_data)
                     continue
-
+                print(user_data)
                 if 'data' in user_data:
                     user_info = user_data['data']
                     
@@ -72,17 +72,22 @@ def main():
                         tree_type = tree.get('tree_type', 'Unknown')
                         last_claimed_at = tree.get('last_claimed_at')
                         created_at = tree.get('created_at')
+                        boosted_at = tree.get('started_boost_at')  # Boost information
+                        speed = tree.get('speed', 1)  # Default to 1 if no boost
+
+                        # Check if the tree has been boosted
+                        boosted = boosted_at is not None
                         
-                        # Calculate the number of fallen fruits only if the tree is not expired
-                        fruits_fall = calculate_fruits_fall(tree_type, last_claimed_at, created_at)
-                        
-                        expired = is_tree_expired(tree_type, created_at)
+                        # Calculate fallen fruits considering boosts
+                        fruits_fall = calculate_fruits_fall(tree_type, last_claimed_at, created_at, speed)
+
+                        # Check if the tree is expired (consider boost)
+                        expired = is_tree_expired(tree_type, created_at, boosted_at)
                         ready_for_harvest = remaining_time == timedelta(0)
                         
-                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired)
-                        
-                        if ready_for_harvest and fruits_fall > 0 and not expired:
-                            any_ready_for_harvest = True
+                        # Display tree information, including boost status
+                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted)
+
                     
                     # Claim rewards using the token only if any tree is ready and has claimable fruits
                     if any_ready_for_harvest:
