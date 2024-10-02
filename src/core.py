@@ -100,7 +100,7 @@ def display_user_info(username, total_gems, total_trees, remaining_time):
     print(Fore.GREEN + f"Farming Session Remaining: {str(remaining_time).split('.')[0]}")  # Remove milliseconds
     print(Fore.GREEN + "----------------------------------------")
 
-def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted):
+def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted, speed):
     # Set color for expired and boosted statuses
     tree_type_str = tree_type
     if expired:
@@ -112,6 +112,7 @@ def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, ex
     print(f"Tree Type: {tree_type_str}")
     print(f"Total Fruit: {fruit_total}")
     print(f"Fruits to Fall: {fruits_fall}")
+    print(f"Speed: {speed:.2f}")  # Display the speed of the tree
     print(f"Tree {tree_type} is {'ready for harvest' if ready_for_harvest else 'not ready for harvest'}.")
     print("-" * 60)
 

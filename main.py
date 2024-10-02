@@ -86,7 +86,7 @@ def main():
                         ready_for_harvest = remaining_time == timedelta(0)
                         
                         # Display tree information, including boost status
-                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted)
+                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted, speed)
 
                     
                     # Claim rewards using the token only if any tree is ready and has claimable fruits
