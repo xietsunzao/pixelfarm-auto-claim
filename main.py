@@ -73,19 +73,22 @@ def main():
                         last_claimed_at = tree.get('last_claimed_at')
                         created_at = tree.get('created_at')
                         boosted_at = tree.get('started_boost_at')  # Boost information
-                        speed = tree.get('speed', 1)  # Default to 1 if no boost
-
-                        # Check if the tree has been boosted
+                        speed = tree.get('speed', 1)  # Default speed
+                        
+                        # Check if the tree is boosted
                         boosted = boosted_at is not None
                         
-                        # Calculate fallen fruits considering boosts
+                        # Calculate fallen fruits considering boost
                         fruits_fall = calculate_fruits_fall(tree_type, last_claimed_at, created_at, speed)
-
-                        # Check if the tree is expired (consider boost)
-                        expired = is_tree_expired(tree_type, created_at, boosted_at)
+                        
+                        # Check if the tree is expired only if it's not boosted
+                        expired = False
+                        if not boosted:
+                            expired = is_tree_expired(tree_type, created_at, boosted_at)
+                        
                         ready_for_harvest = remaining_time == timedelta(0)
                         
-                        # Display tree information, including boost status
+                        # Display tree information, including speed, expired, and boosted status
                         display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted, speed)
 
                     

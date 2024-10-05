@@ -101,18 +101,20 @@ def display_user_info(username, total_gems, total_trees, remaining_time):
     print(Fore.GREEN + "----------------------------------------")
 
 def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted, speed):
-    # Set color for expired and boosted statuses
+    # Set color for tree type and handle expired/boosted logic
     tree_type_str = tree_type
-    if expired:
-        tree_type_str += f" {Fore.RED}(Expired){Style.RESET_ALL}"
+    
+    # If the tree is boosted, we won't display 'expired', only 'boosted'
     if boosted:
         tree_type_str += f" {Fore.GREEN}(Boosted){Style.RESET_ALL}"
+    elif expired:
+        tree_type_str += f" {Fore.RED}(Expired){Style.RESET_ALL}"
     
     # Print tree details with colors
     print(f"Tree Type: {tree_type_str}")
     print(f"Total Fruit: {fruit_total}")
     print(f"Fruits to Fall: {fruits_fall}")
-    print(f"Speed: {speed:.2f}")  # Display the speed of the tree
+    print(f"Speed: {speed:.2f}")
     print(f"Tree {tree_type} is {'ready for harvest' if ready_for_harvest else 'not ready for harvest'}.")
     print("-" * 60)
 
