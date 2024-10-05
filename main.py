@@ -41,7 +41,7 @@ def main():
                     print(Fore.RED + f"Error fetching user data: {str(e)}. Retrying token...")
                     session.token = get_token(init_data)
                     continue
-                print(user_data)
+                
                 if 'data' in user_data:
                     user_info = user_data['data']
                     
