@@ -88,10 +88,6 @@ def calculate_fruits_fall(tree_type, last_claimed_at, created_at, speed=1):
     fruits_fall = FRUIT_RATES[tree_type] * speed * time_elapsed.total_seconds()
     return int(fruits_fall)
 
-
-
-
-
 def display_user_info(username, total_gems, total_trees, remaining_time):
     print(Fore.GREEN + "----------------------------------------")
     print(Fore.GREEN + f"Username     : {username}")
