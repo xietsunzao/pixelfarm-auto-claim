@@ -35,35 +35,17 @@ def should_harvest(tree):
     # Assuming trees can be harvested every hour
     return time_diff >= timedelta(hours=1)
 
-def is_tree_expired(tree_type, created_at, boosted_at=None):
+def is_tree_expired(tree_type, created_at):
     if TREE_EXPIRATION_DAYS.get(tree_type) is None:
-        return False  # Plum tree doesn't expire
-    
-    created = datetime.fromisoformat(created_at[:-1])
-    
-    # If the tree has a boost, extend the expiration period
+        return False  # Example: plum tree doesn't expire
+
+    created = datetime.fromisoformat(created_at[:-1])  # Remove the 'Z' for parsing
+
+    # Calculate expiration period
     expiration_period = timedelta(days=TREE_EXPIRATION_DAYS[tree_type])
-    
-    if boosted_at:
-        boost_start = datetime.fromisoformat(boosted_at[:-1])
-        # Extend expiration period by, for example, 10 days when boosted
-        extended_period = timedelta(days=10)  
-        expiration_period += extended_period
-    
+
+    # Return whether the tree is expired based on the created date
     return (datetime.utcnow() - created) > expiration_period
-
-
-def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired=False):
-    label = Fore.RED + "(Expired)" if expired else ""
-    print(Fore.CYAN + f"Tree Type: {tree_type.capitalize()} {label}")
-    print(Fore.CYAN + f"Total Fruit: {fruit_total}")
-    print(Fore.CYAN + f"Fruits to Fall: {fruits_fall}")
-    if ready_for_harvest:
-        print(Fore.YELLOW + f"Tree {tree_type.capitalize()} is ready for harvest.")
-    else:
-        print(Fore.BLUE + f"Tree {tree_type.capitalize()} is not ready for harvest.")
-    print(Fore.CYAN + "----------------------------------------")
-
 
 def calculate_remaining_time(last_claimed_at, farming_session_duration):
     last_claimed = datetime.fromisoformat(last_claimed_at[:-1])
@@ -96,24 +78,54 @@ def display_user_info(username, total_gems, total_trees, remaining_time):
     print(Fore.GREEN + f"Farming Session Remaining: {str(remaining_time).split('.')[0]}")  # Remove milliseconds
     print(Fore.GREEN + "----------------------------------------")
 
-def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, boosted, speed):
-    # Set color for tree type and handle expired/boosted logic
+# Modify display_tree_info to determine if the tree is boosted based on speed
+def display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, speed, created_at, started_boost_at): 
     tree_type_str = tree_type
-    
-    # If the tree is boosted, we won't display 'expired', only 'boosted'
+
+    # Determine if boosted based on speed
+    boosted = speed > 1.00
     if boosted:
         tree_type_str += f" {Fore.GREEN}(Boosted){Style.RESET_ALL}"
-    elif expired:
-        tree_type_str += f" {Fore.RED}(Expired){Style.RESET_ALL}"
-    
-    # Print tree details with colors
+
+    # Print tree details first
     print(f"Tree Type: {tree_type_str}")
     print(f"Total Fruit: {fruit_total}")
     print(f"Fruits to Fall: {fruits_fall}")
     print(f"Speed: {speed:.2f}")
+
+    # If the tree is boosted, calculate expiration time
+    if boosted:
+        expiration_days = TREE_EXPIRATION_DAYS.get(tree_type, 30)  # Assuming 30 days for boosted trees
+        boost_start = datetime.fromisoformat(started_boost_at[:-1])
+        boost_expiration = boost_start + timedelta(days=expiration_days)
+
+        remaining_time = boost_expiration - datetime.utcnow()
+
+        if remaining_time > timedelta(0):
+            days_left = remaining_time.days
+            hours_left, remainder = divmod(remaining_time.seconds, 3600)
+            minutes_left, _ = divmod(remainder, 60)
+
+            print(f"Tree will expire in: {days_left} days, {hours_left} hours, {minutes_left} minutes")
+        else:
+            print(f"{Fore.RED}Tree {tree_type} is Expired{Style.RESET_ALL}")
+    else:
+        # For non-boosted trees, check standard expiration
+        expiration_days = TREE_EXPIRATION_DAYS.get(tree_type)
+        if expiration_days is not None:
+            creation_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
+            days_until_expiry = (creation_date + timedelta(days=expiration_days) - datetime.utcnow()).days
+            
+            if days_until_expiry <= 0:
+                print(f"{Fore.RED}Tree {tree_type} is Expired{Style.RESET_ALL}")
+            else:
+                print(f"Tree will expire in: {days_until_expiry} days")
+        else:
+            print(f"Tree {tree_type} {Fore.YELLOW}(Doesn't Expire){Style.RESET_ALL}")
+
+    # Display harvest status
     print(f"Tree {tree_type} is {'ready for harvest' if ready_for_harvest else 'not ready for harvest'}.")
     print("-" * 60)
-
 
 def countdown_timer(seconds):
     while seconds > 0:
@@ -121,4 +133,4 @@ def countdown_timer(seconds):
         print(Fore.YELLOW + f"\rWaiting for the next session: {time_left}", end="")
         time.sleep(1)
         seconds -= 1
-    print()  # Newline after the countdown ends
+    print()  # Newline after the countdown ends 
