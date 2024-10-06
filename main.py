@@ -1,13 +1,14 @@
-# Created By : Xietsunzao
-
 import sys
 import os
 import json
 from datetime import timedelta
 from colorama import Fore, init
+import time
+
+# Initialize colorama for colored console output
 init(autoreset=True)
 
-# import module src
+# Import modules from 'src'
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from api import get_token, fetch_user_data, claim_rewards
@@ -41,7 +42,7 @@ def main():
                     print(Fore.RED + f"Error fetching user data: {str(e)}. Retrying token...")
                     session.token = get_token(init_data)
                     continue
-                
+
                 if 'data' in user_data:
                     user_info = user_data['data']
                     
@@ -67,34 +68,31 @@ def main():
                     any_ready_for_harvest = False
                     
                     # Display total fruit for each tree and check if it's ready for harvest
-                    # Inside the loop, where you process each tree
                     for tree in trees:
                         fruit_total = tree.get('fruit_total', 0)
                         tree_type = tree.get('tree_type', 'Unknown')
                         last_claimed_at = tree.get('last_claimed_at')
                         created_at = tree.get('created_at')
-                        started_boost_at = tree.get('started_boost_at')  # Boost information
-                        speed = tree.get('speed', 1)  # Default speed
+                        boosted_at = tree.get('started_boost_at')  # Boost information
+                        speed = tree.get('speed', 1)  # Default to 1 if no boost
 
-                        # Check if the tree is boosted
-                        boosted = started_boost_at is not None
-
-                        # Calculate remaining time for each tree
-                        remaining_time = calculate_remaining_time(last_claimed_at, farming_session_duration)
-
-                        # Calculate fallen fruits considering boost
+                        # Check if the tree has been boosted
+                        boosted = boosted_at is not None
+                        
+                        # Calculate fallen fruits considering boosts
                         fruits_fall = calculate_fruits_fall(tree_type, last_claimed_at, created_at, speed)
 
-                        # Check if the tree is expired only if it's not boosted
-                        expired = False
-                        if not boosted:
-                            expired = is_tree_expired(tree_type, created_at)
-
-                        # Now calculate ready_for_harvest for each individual tree
+                        # Check if the tree is expired (consider boost)
+                        expired = is_tree_expired(tree_type, created_at)
                         ready_for_harvest = remaining_time == timedelta(0)
+                        
+                        # Display tree information, including boost status
+                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, speed, created_at, boosted_at)
 
-                        # Display tree information
-                        display_tree_info(tree_type, fruit_total, ready_for_harvest, fruits_fall, expired, speed, created_at, started_boost_at)                  
+                        # If a tree is ready for harvest, set the flag
+                        if ready_for_harvest and not expired:
+                            any_ready_for_harvest = True
+                    
                     # Claim rewards using the token only if any tree is ready and has claimable fruits
                     if any_ready_for_harvest:
                         try:
@@ -105,9 +103,13 @@ def main():
                     else:
                         if remaining_time > timedelta(0):
                             total_seconds = int(remaining_time.total_seconds())
-                            countdown_timer(total_seconds)
+                            countdown_timer(total_seconds)  # Start countdown to next session
                         else:
                             print(Fore.RED + "Farming session expired. No fruits to claim. Skipping claim.")
+
+                        # After the countdown or session expiry, sleep for 5 seconds before next check
+                        time.sleep(5)  # Short sleep to avoid constant checks
+                
                 else:
                     print(Fore.RED + "Failed to retrieve user data.")
             else:
