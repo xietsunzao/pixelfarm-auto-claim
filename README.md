@@ -6,14 +6,6 @@
 
 Pixelfarm Airdrop Bot is a Telegram bot that automatically claims rewards from the Pixelfarm app when the farming session expires.
 
-## Buy me a coffee
-
-If you find this bot helpful, consider buying me a coffee:
-
-```bash
-0x12aab224FA1D30Ee44575335B7767D8c89cD70A9
-```
-
 ## Requirements
 
 - Python 3.8.1
