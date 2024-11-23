@@ -1,7 +1,6 @@
 # Pixelfarm Auto-Claim Bot
 
 ![pixelfarmautoclaim](https://github.com/user-attachments/assets/57328d4d-1aee-4460-8322-d85df25aa073)
-![image](https://github.com/user-attachments/assets/29c9e34a-7834-4c9b-abb8-805246ad23d1)
 
 
 Pixelfarm Airdrop Bot is a Telegram bot that automatically claims rewards from the Pixelfarm app when the farming session expires.
